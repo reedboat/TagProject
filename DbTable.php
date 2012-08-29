@@ -6,7 +6,7 @@ class DbTable {
 
     protected $_attributes = array();
     protected $_pk;
-    protected $primaryKey = 'id';
+    public $primaryKey = 'id';
     protected $_columns   = array();
     protected $_columnsDefault   = array();
     protected $_new = false;
@@ -27,10 +27,12 @@ class DbTable {
     public function init(){
     }
 
-    public function setDbConnnection($db){
-        if (self::$db != null){
-            return self::$db;
-        }
+    public function setDbConnection($db){
+        self::$db = $db;
+    }
+
+    public function getDbConnection(){
+        return self::$db;
     }
 
     public function instantiate($attributes){
@@ -61,7 +63,9 @@ class DbTable {
     }
     
     public function __get($name){
-        return $this->_attributes[$name];
+        if(in_array($name, $this->_columns) && isset($this->_attributes[$name])){
+            return $this->_attributes[$name];
+        }
     }
 
 	public static function model($className=__CLASS__){
@@ -183,7 +187,7 @@ class DbTable {
 
     public function execute($sql, $attrs){
         $stmt = self::$db->prepare($sql);
-        echo $sql, "\n";
+        if (!$stmt){return false;}
         $result = $stmt->execute($attrs);
         if (!$result) return false;
         if (strtolower(substr($sql, 0, 6)) == 'select') {
