@@ -2,10 +2,7 @@
 class Tag extends DbTable
 {
     public $primaryKey = 'id';
-    protected $_metaData = array(
-        'primaryKey' => 'id',
-        'columns'    => array('id', 'name', 'frequency', 'create_time'),
-    );
+    protected $_columns  = array('id', 'name', 'frequency', 'create_time');
 
     public function tableName()
     {

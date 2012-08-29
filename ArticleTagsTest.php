@@ -37,7 +37,6 @@ class ArticleTagsTest extends CDbTestCase
         $this->assertTrue($article->saveTags($tags), "save article tags failed");
 
         $pk = array('site'=>$site, 'id'=>$id);
-        $data = ArticleTags::model()->findAll();
         $article2 = ArticleTags::model()->findByPk($pk);
         $this->assertNotNull($article2);
         $this->assertEquals(implode(';', $tags), $article2->tags);

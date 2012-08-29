@@ -1,8 +1,11 @@
 <?php
-class ArticleTags extends CActiveRecord
+class ArticleTags extends DbTable
 {
     protected $primaryKey = array('site', 'id');
     protected $delimiter  = ';';
+    protected $_columns   = array(
+        'site', 'id', 'tags', 'create_time', 'update_time'
+    );
 
 
     public static function model($className = __CLASS__){
@@ -10,13 +13,7 @@ class ArticleTags extends CActiveRecord
     }
 
     public function tableName(){
-        return '{{article_tags}}';
-    }
-
-    public function rules(){
-        return array(
-            array( 'site, id, tags', 'required' ),
-        );
+        return 'tbl_article_tags';
     }
 
     protected function fireEvent($event, $data) {
@@ -153,5 +150,4 @@ class ArticleTags extends CActiveRecord
     public static function genId($id){
         return date("Ymd") . sprintf("%07s", $id);
     }
-
 }

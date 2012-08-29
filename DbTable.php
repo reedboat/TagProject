@@ -7,17 +7,20 @@ class DbTable {
     protected $_attributes = array();
     protected $_pk;
     protected $primaryKey = 'id';
-    protected $_metaData = array(
-        'primaryKey'     => 'id',
-        'columns'        => array(),
-        'columnsDefault' => array(),
-    );
+    protected $_columns   = array();
+    protected $_columnsDefault   = array();
+    protected $_new = false;
 
 	public function __construct($scenario='insert')
 	{
-        if (isset($this->_metaData['columnDefaults'])){
-            $this->_attributes = $this->_metaData['columnDefaults'];
+        if ($scenario != 'insert'){
+            return ;
         }
+
+        if (!empty($this->_columnDefaults)){
+            $this->_attributes = $this->_columnDefaults;
+        }
+        $this->_new = true;
 		$this->init();
 	}
 
@@ -36,11 +39,6 @@ class DbTable {
 		return $model;
     }
 
-	public function getMetaData()
-	{
-        return $this->_metaData;
-	}
-    
 	public function getPrimaryKey()
 	{
 		if(is_string($this->primaryKey))
@@ -57,7 +55,7 @@ class DbTable {
 	}
 
     public function __set($name, $value){
-        if(in_array($name, $this->_metaData['columns'])){
+        if(in_array($name, $this->_columns)){
             $this->_attributes[$name]=$value;
         }
     }
@@ -77,16 +75,21 @@ class DbTable {
     }
 
     public function isNewRecord(){
-        $primaryKey = $this->_metaData['primaryKey'];
-        if (!isset($this->_attributes[$this->primaryKey])){
-            return true;
+        return $this->_new;
+    }
+
+    public function deleteAll($attributes){
+        $sql = "DELETE FROM " . $this->tableName() . " WHERE ";
+        $conditions = array();
+        foreach($attributes as $col => $value){
+            $conditions[] = "$col=?";
         }
-        return false;
+        $sql .= implode(" AND ", $conditions);
+        return $this->execute($sql, array_values($attributes));
     }
 
     public function save(){
         if (method_exists($this, 'beforeSave')){
-            var_dump('aaa');
             $this->beforeSave();
         }
         if ($this->isNewRecord()) {
@@ -98,8 +101,14 @@ class DbTable {
             $result = $this->execute($sql, array_values($this->_attributes));
             if ($result){
                 $id = self::$db->lastInsertId();
-                $this->_attributes[$this->primaryKey] = $id;
-                $this->_pk = $id;
+                if (is_string($this->primaryKey) && $this->{$primaryKey} !== null) {
+                    $this->_attributes[$this->primaryKey] = $id;
+                }
+                
+                if ($this->_pk != null){
+                    $this->_pk = $this->getPrimaryKey();
+                }
+                $this->_new = false;
             }
             return $result;
         }
@@ -114,6 +123,9 @@ class DbTable {
     }
     
     public function findByPk($id){
+        if (is_array($this->primaryKey)){
+            return $this->findByAttributes($id);
+        }
         $sql  = 'select * from ' . $this->tableName() . " WHERE {$this->primaryKey}=?";
         $stmt = $this->execute($sql, array($id));
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -149,11 +161,10 @@ class DbTable {
     public function findAll($condition=array()){
         $sql = "select * from " .$this->tableName() . " ";
         if (isset($condition['condition'])){
-            var_dump('ss');
             $sql .= " WHERE {$condition['condition']}";
         }
-        if (isset($condition['sort'])) {
-            $sql .=" ORDER BY {$condition['sort']}"; 
+        if (isset($condition['order'])) {
+            $sql .=" ORDER BY {$condition['order']}"; 
         }
         if (isset($condition['limit'])){
             $sql .=" LIMIT {$condition['limit']}";
@@ -172,6 +183,7 @@ class DbTable {
 
     public function execute($sql, $attrs){
         $stmt = self::$db->prepare($sql);
+        echo $sql, "\n";
         $result = $stmt->execute($attrs);
         if (!$result) return false;
         if (strtolower(substr($sql, 0, 6)) == 'select') {
@@ -210,13 +222,16 @@ class DbTable {
 			return null;
     }
 
+    public function getAttributes(){
+        return $this->_attributes;
+    }
     public function setAttributes($attributes){
         foreach($attributes as $name=>$value)
         {
             if(property_exists($this,$name))
                 $this->$name=$value;
             //else if(isset($this->schema['columns'][$name]))
-            else if(in_array($name, $this->_metaData['columns']))
+            else if(in_array($name, $this->_columns))
                 $this->_attributes[$name]=$value;
         }
     }
@@ -224,7 +239,7 @@ class DbTable {
     public function setAttribute($name, $value){
             if(property_exists($this,$name))
                 $this->$name=$value;
-            else if(in_array($name, $this->_metaData['columns']))
+            else if(in_array($name, $this->_columns))
                 $this->_attributes[$name]=$value;
     }
 
