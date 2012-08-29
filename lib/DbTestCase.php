@@ -123,6 +123,13 @@ abstract class DbTestCase extends PHPUnit_Framework_TestCase
     protected function resetTable($tableName){
         $db=$this->getDbConnection();
         $db->exec('DELETE FROM '.$tableName);
-        
+        $driver = $db->getAttribute(PDO::ATTR_DRIVER_NAME);
+        if ($driver == 'sqlite'){
+            $sql = "delete from sqlite_sequence where name=" . $db->quote($tableName);
+            $result = $db->exec($sql);
+        }
+        else if ($driver == 'mysql'){
+            $db->exec("truncate table " . $db->quote($tableName));
+        }
     }
 }

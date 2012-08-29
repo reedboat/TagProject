@@ -1,7 +1,7 @@
 <?php
 class ArticleTags extends DbTable
 {
-    protected $primaryKey = array('site', 'id');
+    public $primaryKey = array('site', 'id');
     protected $delimiter  = ';';
     protected $_columns   = array(
         'site', 'id', 'tags', 'create_time', 'update_time'

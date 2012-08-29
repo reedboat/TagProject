@@ -2,7 +2,7 @@
 class Tag extends DbTable
 {
     public $primaryKey = 'id';
-    protected $_columns  = array('id', 'name', 'frequency', 'create_time');
+    protected $_columns  = array('id', 'name', 'frequency', 'create_time', 'category');
 
     public function tableName()
     {
@@ -24,7 +24,7 @@ class Tag extends DbTable
         ));
         $names=array();
         foreach($tags as $tag)
-            $names[]=$tag['name'];
+            $names[]=$tag->name;
         return $names;
     }
 
@@ -68,8 +68,12 @@ class Tag extends DbTable
     protected function beforeSave(){
         if (parent::beforeSave()){
             if ($this->isNewRecord()){
-                $this->setAttribute('create_time', time());
-                $this->setAttribute('frequency', 1);
+                if (!isset($this->create_time)){
+                    $this->setAttribute('create_time', time());
+                }
+                if (!isset($this->frequency)){
+                    $this->setAttribute('frequency', 1);
+                }
             }
             return true;
         }

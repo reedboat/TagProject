@@ -4,7 +4,7 @@
  **/
 class TagArticles extends DbTable
 {
-    protected $primaryKey = 'tag_id';
+    public $primaryKey = 'tag_id';
     protected $_columns   = array('tag_id', 'site_id', 'news_id', 'time');
 
 	public static function model($className=__CLASS__)
@@ -56,9 +56,7 @@ class TagArticles extends DbTable
     public function removeIndex($tag_id, $data){
         $site_id = $data['site_id'];
         $news_id = $data['news_id'];
-        $criteria = new CDbCriteria;
-        $criteria['condition'] = 'tag_id=:tag_id and site_id=:site_id and news_id=:news_id';
-        $criteria['params'] = array(':tag_id'=>$tag_id, ':site_id'=>$site_id, ":news_id"=>$news_id);
-        return self::model()->delete($criteria);
+        $conditions = array('tag_id'=>$tag_id, 'site_id'=>$site_id, "news_id"=>$news_id);
+        return self::model()->deleteAll($conditions);
     }
 }

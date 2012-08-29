@@ -61,20 +61,27 @@ class DbTable {
             $this->_attributes[$name]=$value;
         }
     }
-    
+
+    public function __isset($name){
+        if(in_array($name, $this->_columns) && isset($this->_attributes[$name])){
+            return true;
+        }
+        return false;
+    }
+
     public function __get($name){
         if(in_array($name, $this->_columns) && isset($this->_attributes[$name])){
             return $this->_attributes[$name];
         }
     }
 
-	public static function model($className=__CLASS__){
-		if(isset(self::$_models[$className]))
-			return self::$_models[$className];
-		else
-		{
-			$model=self::$_models[$className]=new $className(null);
-			return $model;
+    public static function model($className=__CLASS__){
+        if(isset(self::$_models[$className]))
+            return self::$_models[$className];
+        else
+        {
+            $model=self::$_models[$className]=new $className(null);
+            return $model;
         }
     }
 
@@ -105,10 +112,13 @@ class DbTable {
             $result = $this->execute($sql, array_values($this->_attributes));
             if ($result){
                 $id = self::$db->lastInsertId();
-                if (is_string($this->primaryKey) && $this->{$primaryKey} !== null) {
-                    $this->_attributes[$this->primaryKey] = $id;
+                $primaryKey = $this->primaryKey;
+                if (is_string($primaryKey)) {
+                    if (!isset($this->_attributes[$primaryKey])){
+                        $this->_attributes[$primaryKey] = $id;
+                    }
                 }
-                
+
                 if ($this->_pk != null){
                     $this->_pk = $this->getPrimaryKey();
                 }
@@ -119,13 +129,34 @@ class DbTable {
         else {
             $sql  = 'UPDATE ' . $this->tableName() . " SET ";
             $attrs = $this->_attributes;
-            unset($attrs[$this->primaryKey]);
+            $primaryKey = $this->primaryKey;
+            if (is_string($primaryKey)){
+                $pk = array($attrs[$primaryKey]);
+                unset($attrs[$primaryKey]);
+            }
+            else if (is_array($primaryKey)){
+                $pk = array();
+                foreach($primaryKey as $name){
+                    $pk[] = $attrs[$name];
+                    unset($attrs[$name]);
+                }
+            }
             $sql .= implode('=?,', array_keys($attrs)) . '=? ';
-            $sql .= "WHERE " . $this->primaryKey . ' = ?';
-            return $this->execute($sql, array_values($attrs));
+            $sql .= "WHERE ";
+            if (is_string($primaryKey)){
+                $sql .= $this->primaryKey . ' = ?';
+            }
+            else if (is_array($primaryKey)){
+                $conditions = array();
+                foreach($primaryKey as $name){
+                    $conditions[] = "$name = ?";
+                }
+                $sql .= implode(" AND ", $conditions);
+            }
+            return $this->execute($sql, array_merge(array_values($attrs), $pk));
         }
     }
-    
+
     public function findByPk($id){
         if (is_array($this->primaryKey)){
             return $this->findByAttributes($id);
@@ -178,7 +209,7 @@ class DbTable {
         $data = $stmt? $stmt->fetchAll(PDO::FETCH_ASSOC) : false;
         return $this->populateRecords($data);
     } 
-    
+
     public function findAllBySql($sql, $data){
         $stmt = $this->execute($sql, $data);
         $data = $stmt? $stmt->fetchAll(PDO::FETCH_ASSOC) : false;
@@ -197,33 +228,33 @@ class DbTable {
     }
 
 
-	public function populateRecords($data,$index=null)
-	{
-		$records=array();
-		foreach($data as $attributes)
-		{
-			if(($record=$this->populateRecord($attributes))!==null)
-			{
-				if($index===null)
-					$records[]=$record;
-				else
-					$records[$record->$index]=$record;
-			}
-		}
-		return $records;
-	}
+    public function populateRecords($data,$index=null)
+    {
+        $records=array();
+        foreach($data as $attributes)
+        {
+            if(($record=$this->populateRecord($attributes))!==null)
+            {
+                if($index===null)
+                    $records[]=$record;
+                else
+                    $records[$record->$index]=$record;
+            }
+        }
+        return $records;
+    }
 
     public function populateRecord($attributes){
-		if($attributes!==false)
-		{
-			$record=$this->instantiate($attributes);
-			$record->init();
+        if($attributes!==false)
+        {
+            $record=$this->instantiate($attributes);
+            $record->init();
             $record->setAttributes($attributes);
-			$record->_pk=$record->getPrimaryKey();
-			return $record;
-		}
-		else
-			return null;
+            $record->_pk=$record->getPrimaryKey();
+            return $record;
+        }
+        else
+            return null;
     }
 
     public function getAttributes(){
@@ -241,10 +272,10 @@ class DbTable {
     }
 
     public function setAttribute($name, $value){
-            if(property_exists($this,$name))
-                $this->$name=$value;
-            else if(in_array($name, $this->_columns))
-                $this->_attributes[$name]=$value;
+        if(property_exists($this,$name))
+            $this->$name=$value;
+        else if(in_array($name, $this->_columns))
+            $this->_attributes[$name]=$value;
     }
 
     protected function beforeSave(){

@@ -2,7 +2,7 @@
 /**
  * 
  **/
-class ArticleTagsTest extends CDbTestCase
+class ArticleTagsTest extends DbTestCase
 {
     public function setUp(){
         parent::setUp(); 
@@ -99,6 +99,6 @@ class ArticleTagsTest extends CDbTestCase
         $indexer = new TagArticles();
         $rows = $indexer->search(Tag::fetch('iphone')->id, 1);
         $this->assertEquals(1, count($rows));
-        $this->assertEquals($id, $rows[0]['news_id']);
+        $this->assertEquals($id, $rows[0]->news_id);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-class TagTest extends CDbTestCase
+class TagTest extends DbTestCase
 {
 	public $fixtures=array(
 		'tags'=>'Tag',
@@ -29,6 +29,7 @@ class TagTest extends CDbTestCase
         $this->assertTrue($tag->save());
 
         $tag2 = Tag::model()->findByPk($tag->id);
+        $this->assertNotNull($tag2);
         $this->assertEquals($tag->name, $tag2->name);
         $this->assertEquals($tag->category, $tag2->category);
         $this->assertEquals(1, $tag2->frequency);
