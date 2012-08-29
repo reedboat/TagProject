@@ -1,6 +1,6 @@
 <?php
 class Db {
-    private $db = null;
+    private $conn = null;
 
     private static $instance;
     
@@ -13,44 +13,49 @@ class Db {
     }
 
     public function getDBConnection(){
-        return self::$db;
+        return $this->conn;
     }
-    public function setDBConnection($db){
-        self::$db = $db;
-    }
-
-    public static function makeConnection($dsn, $username='', $password='', $driver_options=array()){
-        return new PDO($dsn, $username, $password, $driver_options);
+    public function setDBConnection($conn){
+        $this->conn = $conn;
     }
 
     public function selectDB($dbname){
         if ($this->db->getAttribute(PDO::ATTR_DRIVER_NAME)== 'mysql'){
-            $this->db->exec("use " . PDO::quote($dbname));
+            return $this->db->exec("use " . PDO::quote($dbname));
         }
+        return false;
     }
 
     public function connect($dsn, $username='', $password='', $driver_options=array()){
-        $this->db = new PDO($dsn, $username, $password, $driver_options);
-    }
-
-
-    public function connectMysql($server, $username='', $password='', $dbname=''){
-        $dsn = '';
-        $this->connect($dsn, $username, $password);
+        $this->conn = new PDO($dsn, $username, $password, $driver_options);
     }
 
     public function execute($sql, $params){
-        $stmt = $this->db->prepare($sql);
+        if (!$this->conn) {
+            return false;
+        }
+
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            return false;
+        }
+
         return $stmt->execute($params);
     }
 
     public function query($sql, $params){
-        $stmt = $this->db->prepare($sql);
+        if (!$this->conn) {
+            return false;
+        }
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            return false;
+        }
         $stmt->execute($params);
         return $stmt;
     }
 
     public function close(){
-        unset($this->db);
+        unset($this->conn);
     }
 }
