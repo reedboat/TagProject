@@ -2,12 +2,12 @@
 
 // change the following paths if necessary
 
-require "../lib/DbTable.php";
-require "../lib/DbTestCase.php";
+require "inc/tags/DbTable.class.php";
+require "inc/tags/DbTestCase.class.php";
 
-require "../Tag.php";
-require "../TagArticles.php";
-require "../ArticleTags.php";
+require "AppData/Tags/Tag.inc.php";
+require "AppData/Tags/TagArticles.inc.php";
+require "AppData/Tags/ArticleTags.inc.php";
 
 $db = new PDO('sqlite:data/blog-test.db'); 
 DbTable::setDbConnection($db);

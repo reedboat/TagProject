@@ -3,7 +3,7 @@ class TagArticlesTest extends DbTestCase {
     // 本表比较大，尽量减小存储
     //
     public $fixtures = array(
-        'tag_articles' => 'TagArticles',
+        'tag_articles' => 'AppData_Tags_TagArticles',
     );
 
     public function __construct(){
@@ -21,14 +21,14 @@ class TagArticlesTest extends DbTestCase {
     }
 
     public function testSearchAll() {
-        $indexer = new TagArticles();
+        $indexer = new AppData_Tags_TagArticles();
         $tag = 'iphone';
         $tag_id = $this->tags[$tag];
         $rows = $indexer->search($tag_id);
         $this->assertEquals(2 , count($rows));
         $row = $rows[0];
         $pk = array('site'=>$this->sites_flip[$row->site_id], 'id'=>$row->news_id);
-        $article = ArticleTags::model()->findByPk($pk);
+        $article = AppData_Tags_ArticleTags::model()->findByPk($pk);
         if ($article){
             $tags = $article->str2arr($article->tags);
             $this->assertTrue(in_array($tag, $tags));
@@ -36,10 +36,10 @@ class TagArticlesTest extends DbTestCase {
     }
 
     public function testSeachSite(){
-        $indexer = new TagArticles();
+        $indexer = new AppData_Tags_TagArticles();
         $name = 'iphone';
         $site = 'ent';
-        $tag_id = Tag::fetch($name)->id;
+        $tag_id = AppData_Tags_Tag::fetch($name)->id;
         $rows = $indexer->searchSite($tag_id, $this->sites[$site]);
         $this->assertEquals(1, count($rows));
         $news_id = date("Ymd", 1345795946) . sprintf("%07s", 1);
@@ -47,12 +47,12 @@ class TagArticlesTest extends DbTestCase {
     }
 
     public function testUpdate() {
-        $indexer = new TagArticles();
+        $indexer = new AppData_Tags_TagArticles();
 
         $tag = 'iphone';
         $pk = array(
             'site_id' => $this->sites['ent'],
-            'news_id' => ArticleTags::genId(21),
+            'news_id' => AppData_Tags_ArticleTags::genId(21),
         );
         $tag_id = $this->tags[$tag];
         $indexer->index($tag_id, $pk);
