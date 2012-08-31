@@ -1,7 +1,7 @@
 <?php
 
 class DbTable {
-    public static $db;
+    protected $db = null;
     private static $_models = array();
 
     protected $_attributes = array();
@@ -27,12 +27,15 @@ class DbTable {
     public function init(){
     }
 
-    public function setDbConnection($db){
-        self::$db = $db;
+    public static function db(){
+        if ($this->db == null) {
+            $this->db = Db::instance()->getDbConnection();
+        }
+        return $this->db;
     }
 
-    public function getDbConnection(){
-        return self::$db;
+    public function setDbConnection($db){
+        $this->db = $db;
     }
 
     public function instantiate($attributes){
@@ -111,7 +114,7 @@ class DbTable {
             $sql .= ')';
             $result = $this->execute($sql, array_values($this->_attributes));
             if ($result){
-                $id = self::$db->lastInsertId();
+                $id = $this->db()->lastInsertId();
                 $primaryKey = $this->primaryKey;
                 if (is_string($primaryKey)) {
                     if (!isset($this->_attributes[$primaryKey])){
@@ -217,16 +220,24 @@ class DbTable {
     }
 
     public function execute($sql, $attrs){
-        $stmt = self::$db->prepare($sql);
-        if (!$stmt){return false;}
-        $result = $stmt->execute($attrs);
-        if (!$result) return false;
+        $stmt = $this->db()->prepare($sql);
+        $this->logger->log("sql execute '$sql (" . implode(', ', $params) . ")'", "DEBUG");
+        if (!$stmt){
+            $this->logger->log("ERROR: sql prepare failed '$sql'", "ERROR");
+            return false;
+        }
+
+        $result = $stmt->execute($params);
+        if (!$result) {
+            $this->logger->log("ERROR: sql execute failed '$sql (" . implode(', ', $params) . ")'", "ERROR");
+            return null;
+        }
+
         if (strtolower(substr($sql, 0, 6)) == 'select') {
             return $stmt;
         }
         return true;
     }
-
 
     public function populateRecords($data,$index=null)
     {
