@@ -2,7 +2,7 @@
 /**
  * 
  **/
-class ArticleTagsTest extends DbTestCase
+class ArticleTagsTest extends WF_DbTestCase
 {
     public function setUp(){
         parent::setUp(); 
@@ -100,17 +100,18 @@ class ArticleTagsTest extends DbTestCase
     public function testTagsIndex(){
         $tags = array('iphone', 'ipad');
         $site_id = 'news';
-        $news_id   = date("Ymd") . sprintf("%07s", '51');
+        $news_id   = util_genId(51);
         $article = new ArticleTags();
         $article->setAttributes( array(
             'site_id' => $site_id, 
             'news_id'   => $news_id,
+            'pub_time'=>util_datetime(),
         ));
         $result = $article->saveTags($tags);
         $this->assertTrue($result);
         
         $indexer = new TagArticles();
-        $rows = $indexer->search(Tag::fetch('iphone')->id, 0, 1);
+        $rows = $indexer->search(Tag::fetch('iphone')->id, 0, 10);
         $this->assertEquals(1, count($rows));
         $this->assertEquals($news_id, $rows[0]['news_id']);
     }

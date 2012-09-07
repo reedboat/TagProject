@@ -8,7 +8,7 @@ $rows = array(
     ),
     array(
         'Fsite'       => 'ent',
-        'Farticle_id' => util_genId(2),
+        'Farticle_id' => util_genId(1),
         'Ftitle'      => '娱乐-标题2',
         'Fpub_time'  => util_datetime(8),
     ),

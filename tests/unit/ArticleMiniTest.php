@@ -1,5 +1,5 @@
  <?php
-class ArticleTest extends DBTestCase
+class ArticleTest extends WF_DbTestCase
 {
     public $fixtures = array(
         'article_mini'  => 'ArticleMini',
@@ -7,7 +7,7 @@ class ArticleTest extends DBTestCase
 
     public function testfindArticles(){
         $pk_list = array(
-           array('ent',  util_genId(2)),
+           array('ent',  util_genId(1)),
            array('news', util_genId(1)),
         );
         $articles = ArticleMini::model()->findArticles($pk_list);
@@ -15,8 +15,8 @@ class ArticleTest extends DBTestCase
         $this->assertNotNull($articles[0]);
         $this->assertNotNull($articles[1]);
 
-        $this->assertEquals($pk_list[0][1], $articles[0]->Farticle_id);
-        $this->assertEquals($pk_list[1][1], $articles[1]->Farticle_id);
+        $this->assertEquals($pk_list[0][1], $articles[0]['Farticle_id']);
+        $this->assertEquals($pk_list[1][1], $articles[1]['Farticle_id']);
 
         $site = 'news';
         $id_list = array(
@@ -26,8 +26,8 @@ class ArticleTest extends DBTestCase
         $articles = ArticleMini::model()->findArticles($site, $id_list);
         $this->assertEquals(count($pk_list), count($articles));
 
-        $this->assertEquals($id_list[0], $articles[0]->Farticle_id);
-        $this->assertEquals($id_list[1], $articles[1]->Farticle_id);
+        $this->assertEquals($id_list[0], $articles[0]['Farticle_id']);
+        $this->assertEquals($id_list[1], $articles[1]['Farticle_id']);
     }
 
     public function testAddArticle(){

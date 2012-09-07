@@ -1,5 +1,5 @@
 <?php
-class TagArticlesTest extends DbTestCase { 
+class TagArticlesTest extends WF_DbTestCase { 
     // 本表比较大，尽量减小存储
     //
     public $fixtures = array(
@@ -10,10 +10,6 @@ class TagArticlesTest extends DbTestCase {
 
     public function __construct(){
         parent::__construct(); 
-        $this->tags = $tags = array(
-            'iphone' => 4,
-            'ipad'   => 3,
-        );
         $this->sites = $sites = array(
             'news' => 1,
             'tech' => 2,
@@ -25,11 +21,11 @@ class TagArticlesTest extends DbTestCase {
     public function testSearchAll() {
         $indexer = new TagArticles();
         $tag = 'iphone';
-        $tag_id = $this->tags[$tag];
+        $tag_id = Tag::fetch($tag)->id;
         $rows = $indexer->search($tag_id);
         $this->assertEquals(2 , count($rows));
         $row = $rows[0];
-        $pk = array('site_id'=>$this->sites_flip[$row['site_id']], 'id'=>$row['news_id']);
+        $pk = array('site_id'=>$this->sites_flip[$row['site_id']], 'news_id'=>$row['news_id']);
         $article = ArticleTags::model()->findByPk($pk);
         if ($article){
             $tags = $article->str2arr($article->tags);
@@ -44,7 +40,7 @@ class TagArticlesTest extends DbTestCase {
         $tag_id = Tag::fetch($name)->id;
         $rows = $indexer->search($tag_id, $site_id);
         $this->assertEquals(1, count($rows));
-        $news_id = date("Ymd", 1345795946) . sprintf("%07s", 1);
+        $news_id = util_genId(1);
         $this->assertEquals($news_id, $rows[0]['news_id']);
     }
 
@@ -56,8 +52,9 @@ class TagArticlesTest extends DbTestCase {
             'site_id' => $this->sites['ent'],
             'news_id' => ArticleTags::genId(21),
         );
-        $tag_id = $this->tags[$tag];
-        $indexer->index($tag_id, $pk);
+        $tag_id = Tag::fetch($tag)->id;
+        $data = $pk + array('time' => util_time(10));
+        $indexer->index($tag_id, $data);
         $articles = $indexer->search($tag_id);
         $article = $articles[0];
         $this->assertEquals($pk['news_id'], $article['news_id']);

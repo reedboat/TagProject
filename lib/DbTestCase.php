@@ -1,5 +1,5 @@
 <?php
-abstract class DbTestCase extends PHPUnit_Framework_TestCase
+abstract class WF_DbTestCase extends PHPUnit_Framework_TestCase
 {
 	/**
 	 * @var array a list of fixtures that should be loaded before each test method executes.
@@ -34,13 +34,13 @@ abstract class DbTestCase extends PHPUnit_Framework_TestCase
 	 * @param string $params method parameters
 	 * @return mixed the property value
 	 */
-	public function __call($name,$params)
-	{
-		//if(is_array($this->fixtures) && isset($params[0]) && ($record=$this->_records($name,$params[0]))!==false)
-		//	return $record;
-		//else
-	    //		throw new Exception("Unknown method '$name' for class '".get_class($this)."'.");
-	}
+	//public function __call($name,$params)
+	//{
+	//	//if(is_array($this->fixtures) && isset($params[0]) && ($record=$this->_records($name,$params[0]))!==false)
+	//	//	return $record;
+	//	//else
+	//    //		throw new Exception("Unknown method '$name' for class '".get_class($this)."'.");
+	//}
 
 	/**
 	 * @param string $name the fixture name (the key value in {@link fixtures}).
@@ -87,10 +87,6 @@ abstract class DbTestCase extends PHPUnit_Framework_TestCase
                 }
             }
         }
-    }
-
-    protected function getDbConnection(){
-        return DbTable::getDbConnection();
     }
 
     public static function setBasePath($basePath){

@@ -6,7 +6,7 @@ CREATE TABLE tbl_tag
     category INT NOT NULL DEFAULT 0,
     frequency INTEGER DEFAULT 1,
     create_time INT UNSIGNED NOT NULL DEFAULT 0,
-    metadata text NOT NULL DEFAULT '',
+    metadata TEXT NOT NULL DEFAULT '',
     UNIQUE (name)
 );
 CREATE INDEX idx_name_fequency ON tbl_tag (name, frequency);
@@ -39,11 +39,12 @@ DROP TABLE IF EXISTS tbl_article_mini;
 CREATE TABLE tbl_article_mini
 (
     --id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    Fsite varchar(64) NOT NULL DEFAULT '',
-    Farticle_id char(14) NOT NULL DEFAULT '',
-    Ftitle varchar(128) NOT NULL DEFAULT '',
-    Fpub_time datetime not null default '',
-    Fabstract varchar(255) NOT NULL DEFAULT '',
-    Fthumbnail varchar(128) NOT NULL DEFAULT '',
+    Fsite VARCHAR(64) NOT NULL DEFAULT '',
+    Farticle_id CHAR(14) NOT NULL DEFAULT '',
+    Ftitle VARCHAR(128) NOT NULL DEFAULT '',
+    Fpub_time DATETIME NOT NULL DEFAULT '',
+    Fabstract VARCHAR(255) NOT NULL DEFAULT '',
+    Fthumbnail VARCHAR(128) NOT NULL DEFAULT '',
+    create_at INT UNSIGNED NOT NULL DEFAULT 0,
     PRIMARY KEY (Fsite, Farticle_id)
 );
