@@ -1,0 +1,32 @@
+
+Tags=/Users/zhqm03/workspace/github/TagProject CD=. filter="*.php *.db" {
+ TagPrjTest.php
+ lib=lib {
+  DbTable.php
+  DbTestCase.php
+ }
+ tests=tests {
+  bootstrap.php
+  data=data {
+   tags.db
+   tags_w.db
+  }
+  fixtures=fixtures {
+   tbl_article_mini.php
+   tbl_article_tags.php
+   tbl_tag.php
+   tbl_tag_articles.php
+   util.func.php
+  }
+  unit=unit {
+   ArticleMiniTest.php
+   ArticleTagsTest.php
+   TagArticleTest.php
+   TagPrjTest.php
+   TagPrjTest2.php
+   TagTest.php
+  }
+ }
+}
+. # pragma keep
+
