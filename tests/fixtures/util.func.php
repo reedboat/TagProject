@@ -17,7 +17,10 @@ function util_datetime($hour=null, $date=null){
     }
 }
 function util_time($hour = 0){
-   $time_base = time() / 86400 * 86400 ;
-   return $time_base + $hour * 3600;
+    if ($hour == 0){
+        return time();    
+    }
+    $time_base = time() / 86400 * 86400 ;
+    return $time_base + $hour * 3600;
 }
 ?>

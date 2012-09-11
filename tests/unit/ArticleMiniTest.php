@@ -34,7 +34,9 @@ class ArticleTest extends WF_DbTestCase
         $site    = 'tech';
         $news_id = util_genId(4);
         $title   = '科技-标题4';
-        $result = ArticleMini::model()->addArticle($site, $news_id, $title, $desc=null, $thumbnail=null);
+        $type    = 0;
+        $pub_time = time();
+        $result = ArticleMini::model()->addArticle($site, $news_id, $title, $type, $pub_time);
         $this->assertTrue($result);
         $article = ArticleMini::model()->findByPk(array($site, $news_id));
         $this->assertNotNull($article);

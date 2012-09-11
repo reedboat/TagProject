@@ -104,14 +104,15 @@ class ArticleTagsTest extends WF_DbTestCase
         $article = new ArticleTags();
         $article->setAttributes( array(
             'site_id' => $site_id, 
-            'news_id'   => $news_id,
-            'pub_time'=>util_datetime(),
+            'news_id' => $news_id,
+            'pub_time'=>util_datetime(23),
+            'type'    => 0,
         ));
         $result = $article->saveTags($tags);
         $this->assertTrue($result);
         
         $indexer = new TagArticles();
-        $rows = $indexer->search(Tag::fetch('iphone')->id, 0, 10);
+        $rows = $indexer->search(Tag::fetch('iphone')->id, 0, 0, 1);
         $this->assertEquals(1, count($rows));
         $this->assertEquals($news_id, $rows[0]['news_id']);
     }

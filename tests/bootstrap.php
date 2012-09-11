@@ -17,9 +17,9 @@ require __DIR__ . '/fixtures/util.func.php';
 
 define("ROOT_DIR", __DIR__);
 
+WF_Registry::set('logger', new WF_Logger());
 $instance = WF_Db::instance('sqlite:'.ROOT_DIR.'/data/tags.db'); 
 WF_Registry::set('db', $instance);
 unset($instance);
-//WF_Registry::set('logger', D);
 
 WF_DbTestCase::setBasePath(ROOT_DIR. "/fixtures");

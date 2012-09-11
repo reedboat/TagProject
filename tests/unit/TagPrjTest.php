@@ -37,7 +37,9 @@ class TagsPrjTest extends WF_DbTestCase {
         $site = 'news';
         $news_id = ArticleTags::genId(1);
         $tags = array('iphone','mobile');
-        $result = $tagsController->setNewsTags($site, $news_id, $tags);
+        $type = 0;
+        $time = time();
+        $result = $tagsController->setNewsTags($site, $news_id, $tags, $type, $time);
         $this->assertTrue($result);
 
         $tags2 = $tagsController->getNewsTags($site, $news_id);

@@ -44,6 +44,28 @@ class TagArticlesTest extends WF_DbTestCase {
         $this->assertEquals($news_id, $rows[0]['news_id']);
     }
 
+    public function testSearchType(){
+        $indexer = new TagArticles();
+        $name = 'iphone';
+        $site_id = 3;//'ent';
+        $type = 1;
+        $tag_id = Tag::fetch($name)->id;
+
+        $rows = $indexer->search($tag_id, $site_id, $type);
+        $this->assertEquals(1, count($rows));
+        $news_id = util_genId(1);
+        $this->assertEquals($news_id, $rows[0]['news_id']);
+
+        $site_id = 0;
+        $rows = $indexer->search($tag_id, $site_id, $type);
+        $this->assertEquals(1, count($rows));
+
+        $site_id = 1;
+        $rows = $indexer->search($tag_id, $site_id, $type);
+        $this->assertEquals(0, count($rows));
+
+    }
+
     public function testUpdate() {
         $indexer = new TagArticles();
 
@@ -53,7 +75,7 @@ class TagArticlesTest extends WF_DbTestCase {
             'news_id' => ArticleTags::genId(21),
         );
         $tag_id = Tag::fetch($tag)->id;
-        $data = $pk + array('time' => util_time(10));
+        $data = $pk + array('pub_time' => util_time(10), 'type'=>0);
         $indexer->index($tag_id, $data);
         $articles = $indexer->search($tag_id);
         $article = $articles[0];

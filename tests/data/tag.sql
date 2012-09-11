@@ -28,12 +28,15 @@ CREATE TABLE tbl_tag_articles
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,   
     tag_id INT NOT NULL DEFAULT 0,
     site_id TINYINT NOT NULL DEFAULT 0,
+    type TINYINT NOT NULL DEFAULT 0,
     time INT UNSIGNED NOT NULL DEFAULT 0,
     news_id CHAR(14) NOT NULL DEFAULT ''
 );
 
-CREATE INDEX idx_tag_site_time ON tbl_tag_articles (tag_id, site_id, time);
 CREATE INDEX idx_tag_time ON tbl_tag_articles (tag_id, time);
+CREATE INDEX idx_tag_site_time ON tbl_tag_articles (tag_id, site_id, time);
+CREATE INDEX idx_tag_type_time ON tbl_tag_articles (tag_id, type, time);
+CREATE INDEX idx_tag_site_type_time ON tbl_tag_articles (tag_id, site_id, type, time);
 
 DROP TABLE IF EXISTS tbl_article_mini;
 CREATE TABLE tbl_article_mini
@@ -43,8 +46,8 @@ CREATE TABLE tbl_article_mini
     Farticle_id CHAR(14) NOT NULL DEFAULT '',
     Ftitle VARCHAR(128) NOT NULL DEFAULT '',
     Fpub_time DATETIME NOT NULL DEFAULT '',
-    Fabstract VARCHAR(255) NOT NULL DEFAULT '',
-    Fthumbnail VARCHAR(128) NOT NULL DEFAULT '',
+    Ftype VARCHAR(128) NOT NULL DEFAULT '',
+    Fmeta TEXT NOT NULL DEFAULT '',
     create_at INT UNSIGNED NOT NULL DEFAULT 0,
     PRIMARY KEY (Fsite, Farticle_id)
 );
