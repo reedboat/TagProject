@@ -8,16 +8,6 @@ class TagArticlesTest extends WF_DbTestCase {
         'tag'          => 'Tag',
     );
 
-    public function __construct(){
-        parent::__construct(); 
-        $this->sites = $sites = array(
-            'news' => 1,
-            'tech' => 2,
-            'ent'  => 3,
-        );
-        $this->sites_flip = array_flip($this->sites);
-    }
-
     public function testSearchAll() {
         $indexer = new TagArticles();
         $tag = 'iphone';
@@ -25,7 +15,7 @@ class TagArticlesTest extends WF_DbTestCase {
         $rows = $indexer->search($tag_id);
         $this->assertEquals(2 , count($rows));
         $row = $rows[0];
-        $pk = array('site_id'=>$this->sites_flip[$row['site_id']], 'news_id'=>$row['news_id']);
+        $pk = array('site_id'=>$row['site_id'], 'news_id'=>$row['news_id']);
         $article = ArticleTags::model()->findByPk($pk);
         if ($article){
             $tags = $article->str2arr($article->tags);
@@ -34,22 +24,21 @@ class TagArticlesTest extends WF_DbTestCase {
     }
 
     public function testSearchSite(){
-        $indexer = new TagArticles();
         $name = 'iphone';
-        $site_id = 3;//'ent';
+        $site_id = TagSite::getSiteId('ent');
         $tag_id = Tag::fetch($name)->id;
-        $rows = $indexer->search($tag_id, $site_id);
+        $rows = TagArticles::model()->search($tag_id, $site_id);
         $this->assertEquals(1, count($rows));
         $news_id = util_genId(1);
         $this->assertEquals($news_id, $rows[0]['news_id']);
     }
 
     public function testSearchType(){
-        $indexer = new TagArticles();
+        $indexer = TagArticles::model();
         $name = 'iphone';
-        $site_id = 3;//'ent';
-        $type = 1;
         $tag_id = Tag::fetch($name)->id;
+        $site_id = TagSite::getSiteId('ent');
+        $type = 1;
 
         $rows = $indexer->search($tag_id, $site_id, $type);
         $this->assertEquals(1, count($rows));
@@ -67,20 +56,58 @@ class TagArticlesTest extends WF_DbTestCase {
     }
 
     public function testUpdate() {
-        $indexer = new TagArticles();
-
         $tag = 'iphone';
         $pk = array(
-            'site_id' => $this->sites['ent'],
-            'news_id' => ArticleTags::genId(21),
+            'site_id' => TagSite::getSiteId('ent'),
+            'news_id' => util_genId(21),
         );
         $tag_id = Tag::fetch($tag)->id;
-        $data = $pk + array('pub_time' => util_time(10), 'type'=>0);
-        $indexer->index($tag_id, $data);
-        $articles = $indexer->search($tag_id);
+        $data = $pk + array('time' => util_time(10), 'type'=>0);
+        $result = TagArticles::model()->index($tag_id, $data);
+        $this->assertTrue($result);
+
+        $articles = TagArticles::model()->search($tag_id);
         $article = $articles[0];
         $this->assertEquals($pk['news_id'], $article['news_id']);
         $this->assertEquals($pk['site_id'], $article['site_id']);
+
+        $result = TagArticles::model()->removeIndex($tag_id, $data);
+        $this->assertTrue($result);
+    }
+
+    public function testRemove(){
+        $tag = 'iphone';
+        $data = array(
+            'site_id' => TagSite::getSiteId('ent'),
+            'news_id' => ArticleTags::genId(1),
+            'type'    => 1,
+            'time'    => util_time(7),
+        );
+        $tag_id = Tag::model()->fetch($tag)->id;
+
+        $count = TagArticles::model()->count($tag_id);
+        $this->assertEquals(2, $count);
+        $count = TagArticles::model()->count($tag_id, $data['site_id']);
+        $this->assertEquals(1, $count);
+        $count = TagArticles::model()->count($tag_id, 0, $data['type']);
+        $this->assertEquals(1, $count);
+        $count = TagArticles::model()->count($tag_id, $data['site_id'], $data['type']);
+        $this->assertEquals(1, $count);
+
+        $result = TagArticles::model()->removeIndex($tag_id, $data);
+        $this->assertTrue($result);
+
+        $count = TagArticles::model()->count($tag_id);
+        $this->assertEquals(1, $count);
+        $count = TagArticles::model()->count($tag_id, $data['site_id']);
+        $this->assertEquals(0, $count);
+        $count = TagArticles::model()->count($tag_id, 0, $data['type']);
+        $this->assertEquals(0, $count);
+        $count = TagArticles::model()->count($tag_id, $data['site_id'], $data['type']);
+        $this->assertEquals(0, $count);
+
+        $result = TagArticles::model()->index($tag_id, $data);
+        $this->assertTrue($result);
     }
 
     public function testSearchPagination(){

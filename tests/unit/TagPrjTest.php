@@ -1,4 +1,7 @@
 <?php
+error_reporting(1);
+ini_set('display_errors', E_ALL);
+
 require_once 'header/web.inc.php';
 require_once 'inc/tags/interface.inc.php';
 require_once 'inc/tags/tags.inc.php';
@@ -16,12 +19,6 @@ class TagsPrjTest extends WF_DbTestCase {
         $this->prj = new Tags_project('tcms.interface.tags');
         WF_Registry::set('db', $this->prj->CData->CDb->r);
         $this->tagsController = $this->prj->rs->data->ext['tags'];
-        $cache = $this->prj->CData->CCache;
-        $cache->delete(AppData_Tags_Tags::genKey('news', ArticleTags::genId(1)));
-        $cache->delete(AppData_Tags_Tags::genKey('TagArticles', 'iphone', 0, 1, 20));
-        $cache->delete(AppData_Tags_Tags::genKey('suggestByKeyword', '腾讯'));
-        $cache->delete(AppData_Tags_Tags::genKey('suggestByKeyword', '微博'));
-        $cache->delete(AppData_Tags_Tags::genKey('suggestByInput', '腾'));
     }
 
     public function testGetTags(){
@@ -52,7 +49,6 @@ class TagsPrjTest extends WF_DbTestCase {
     }
 
     public function testSuggestByKeywords(){
-        //$this->markTestSkipped();
         $tagsController = $this->tagsController;
         $keywords = array('腾讯', '微博');
         $result = $tagsController->suggestByKeywords($keywords);
@@ -63,7 +59,6 @@ class TagsPrjTest extends WF_DbTestCase {
         $this->assertEquals('新浪微博', $tags[2]);
     }
 
-    //@skip
     public function testSuggestByInput(){
         $tagsController = $this->tagsController;
         $input = "腾";
@@ -75,8 +70,13 @@ class TagsPrjTest extends WF_DbTestCase {
         $this->assertEquals('腾讯网', $tags[2]);
     }
 
+    public function testAddArticle(){
+        $this->markTestSkipped();
+    }
+
     //nocache
     public function test_ListByTag(){
+        $this->markTestSkipped();
         $tagsController = $this->tagsController;
         $tag = 'iphone';
         $articles = $tagsController->_listByTag($tag,0);
@@ -87,6 +87,7 @@ class TagsPrjTest extends WF_DbTestCase {
 
     //with cache
     public function testListByTag(){
+        $this->markTestSkipped();
         $tagsController = $this->tagsController;
         $tag = 'iphone';
         // create item in cache
@@ -95,6 +96,12 @@ class TagsPrjTest extends WF_DbTestCase {
         $this->assertTrue(!!$articles[0]);
         $this->assertTrue(!!$articles[1]);
         
+        $site = 'news';
+        $news_id = ArticleTags::genId(1);
+        $tags = array('iphone', 'apple');
+        $result = $tagsController->setNewsTags($site, $news_id, $tags);
+        $this->assertTrue($result);
+
         //get from cache
         $articles = $tagsController->listByTag($tag, 0);
         $this->assertEquals(2, count($articles));

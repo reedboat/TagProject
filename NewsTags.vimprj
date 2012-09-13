@@ -1,0 +1,75 @@
+
+NewsTags=/home/reedboat/workspace/github/TagProject CD=. filter="*.php" {
+ include=~/quick/inc_tags{
+  ArticleMini.inc.php
+  ArticleTags.inc.php
+  Boss.inc.php
+  Tag.inc.php
+  TagArticles.inc.php
+  TagReport.inc.php
+  TagSite.inc.php
+  TagsKey.inc.php
+  TagsProject.inc.php
+  interface.inc.php
+  tags.inc.php
+ }
+ lib=~/quick/inc_tags/lib{
+  Cache.class.php
+  CacheUtil.class.php
+  Config.class.php
+  Db.class.php
+  DbTestCase.class.php
+  Event.class.php
+  Loader.class.php
+  Logger.class.php
+  OrderedList.class.php
+  Project.class.php
+  Queue.class.php
+  Registry.class.php
+  Table.class.php
+  Util.class.php
+ }
+ interface=~/quick/inf_tags{
+  addArticle.php
+  articles.php
+  get.php
+  set.php
+  suggest.php
+  suggestByKeywords.php
+  test.php
+ }
+ controller=~/quick/include/AppData/Tags/{
+  Tags.inc.php
+ }
+ tests=tests {
+  bootstrap.php
+  config=config {
+  }
+  data=data filter="*.sql"{
+   tag.sql
+  }
+  fixtures=fixtures {
+   tbl_article_mini.php
+   tbl_article_tags.php
+   tbl_tag.php
+   tbl_tag_articles.php
+   util.func.php
+  }
+  unit=unit {
+   ArticleMiniTest.php
+   ArticleTagsTest.php
+   TagArticleTest.php
+   TagPrjTest.php
+   TagTest.php
+  }
+ }
+ front=~/win_share/NewsTags/ filter="*.js *.htm *.css" {
+  art-pool.js
+  jquery.ui.autocomplete.js
+  art-pool.php.htm
+  art-pub.php.htm
+  getEditPoolArticle.php.htm
+  singleArticleInfo.php.htm
+  art-pub.css
+ }
+}

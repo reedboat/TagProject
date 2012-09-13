@@ -4,10 +4,10 @@
  **/
 class ArticleTagsTest extends WF_DbTestCase
 {
-    public function setUp(){
+    function setUp(){
         parent::setUp(); 
         $site_id = 1;
-        $news_id   = date("Ymd") . sprintf("%07s", '1');
+        $news_id   = util_genId(1);
         $this->predefined_pk = array(
             'site_id' => $site_id,
             'news_id'   => $news_id,
@@ -30,14 +30,19 @@ class ArticleTagsTest extends WF_DbTestCase
         $site_id = 1;//'news';
         $news_id   = ArticleTags::genId(1);
         $model = ArticleTags::model()->findByPk(array($site_id, $news_id));
+        $this->assertNotNull($model);
         $tags = $model->getTags();
+        $this->assertTrue(is_array($tags));
+        $this->assertTrue(in_array('iphone', $tags));
+
+        $model = ArticleTags::model()->getTags($site_id, $news_id);
         $this->assertTrue(is_array($tags));
         $this->assertTrue(in_array('iphone', $tags));
     }
 
     public function testCreateOld(){
         $site_id = 1;//'news';
-        $news_id = date("Ymd") . sprintf("%07s", '11');
+        $news_id = util_genId(11);
         $tags = array('iphone', 'ipad');
 
         $article = new ArticleTags();
@@ -55,7 +60,7 @@ class ArticleTagsTest extends WF_DbTestCase
 
     public function testCreateNew(){
         $site_id = 1;//'news';
-        $news_id   = date("Ymd") . sprintf("%08s", '12');
+        $news_id   = util_genId(12);
         $new_tagname = 'nokia';
         $tags = array('iphone', $new_tagname);
 
@@ -99,20 +104,21 @@ class ArticleTagsTest extends WF_DbTestCase
 
     public function testTagsIndex(){
         $tags = array('iphone', 'ipad');
-        $site_id = 'news';
+        $site_id = 1;//'news'
         $news_id   = util_genId(51);
         $article = new ArticleTags();
         $article->setAttributes( array(
-            'site_id' => $site_id, 
+            'site_id' => $site_id,
             'news_id' => $news_id,
-            'pub_time'=>util_datetime(23),
+            'time'    => util_time(23),
             'type'    => 0,
         ));
         $result = $article->saveTags($tags);
         $this->assertTrue($result);
         
         $indexer = new TagArticles();
-        $rows = $indexer->search(Tag::fetch('iphone')->id, 0, 0, 1);
+        $tag_id = Tag::fetch('iphone')->id;
+        $rows = $indexer->search($tag_id, 0, 0, 1);
         $this->assertEquals(1, count($rows));
         $this->assertEquals($news_id, $rows[0]['news_id']);
     }

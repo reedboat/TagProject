@@ -13,14 +13,15 @@ class ArticleTags extends WF_Table
     }
 
     public function tableName(){
-        return 'tbl_article_tags';
+        $prefix = WF_Registry::get('prefix', 'tbl_');
+        return $prefix . "article_tags";
     }
 
     protected function fireEvent($event, $data) {
         switch($event) {
             case 'addTag' :
                 $name = $data;
-                $data = array('site_id'=>$this->site_id, 'news_id'=>$this->news_id, 'tag'=>$name);
+                $data = array('site_id'=>$this->site_id, 'news_id'=>$this->news_id, 'pub_time'=>$this->time, 'type'=>$this->type, 'tag'=>$name);
                 call_user_func(array($this, 'onArticleAddTag'), $data);
                 break;
             case 'removeTag':
@@ -124,8 +125,8 @@ class ArticleTags extends WF_Table
         return date("Ymd") . sprintf("%07s", $id);
     }
 
-    protected function onArticleAddTag(WF_Event $event){
-        $tag = Tag::fetch($event->tag);
+    protected function onArticleAddTag($data){
+        $tag = Tag::fetch($data['tag']);
         if ($tag){
             $tag->increment(1);
         }
