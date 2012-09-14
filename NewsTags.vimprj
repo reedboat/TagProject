@@ -23,7 +23,6 @@ NewsTags=/home/reedboat/workspace/github/TagProject CD=. filter="*.php" {
   Loader.class.php
   Logger.class.php
   OrderedList.class.php
-  Project.class.php
   Queue.class.php
   Registry.class.php
   Table.class.php
@@ -44,8 +43,11 @@ NewsTags=/home/reedboat/workspace/github/TagProject CD=. filter="*.php" {
  tests=tests {
   bootstrap.php
   config=config {
+   dev.conf.php
+   test.conf.php
   }
   data=data filter="*.sql"{
+   tag.mysql.sql
    tag.sql
   }
   fixtures=fixtures {
@@ -58,6 +60,9 @@ NewsTags=/home/reedboat/workspace/github/TagProject CD=. filter="*.php" {
   unit=unit {
    ArticleMiniTest.php
    ArticleTagsTest.php
+   EventTest.php
+   InterfaceTest.php
+   QueueTest.php
    TagArticleTest.php
    TagPrjTest.php
    TagTest.php
