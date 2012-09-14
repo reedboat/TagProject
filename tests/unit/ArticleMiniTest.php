@@ -30,6 +30,15 @@ class ArticleTest extends WF_DbTestCase
         $this->assertEquals($id_list[1], $articles[1]['Farticle_id']);
     }
 
+    public function testGetArticle(){
+        $site_id = TagSite::getSiteId('ent');
+        $news_id = util_genId(1);
+        $article = ArticleMini::model()->getArticle($site_id, $news_id);
+        $this->assertEquals($article['Ftitle'] , '娱乐-标题2');
+        $this->assertEquals($article['Ftype'] , 0);
+        $this->assertEquals($article['Fpub_time'] , util_datetime(8));
+    }
+
     public function testAddArticle(){
         $site_id = TagSite::getSiteId('tech');
         $news_id = util_genId(4);
